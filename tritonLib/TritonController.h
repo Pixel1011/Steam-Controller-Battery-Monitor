@@ -450,6 +450,7 @@ private:
   TritonInterface connectionType;
   
   TritonController(hid_device* handle, TritonInterface connection);
+  ~TritonController();
   void close();
   int playNote(int channel, int note, int velocity);
   int playFrequency(int channel, double frequency, int velocity);

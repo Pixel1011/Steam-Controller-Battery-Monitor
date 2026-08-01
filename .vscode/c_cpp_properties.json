@@ -5,7 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/msys64/ucrt64/include/hidapi/**",
-                "C:/msys64/ucrt64/include/**"
+                "C:/msys64/ucrt64/include/**",
+                "C:/msys64/ucrt64/include/qt6/**/*",
+                "C:/msys64/ucrt64/include/qt6/**"
             ],
             "defines": [
                 "_DEBUG",

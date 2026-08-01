@@ -11,6 +11,12 @@ TritonController::TritonController(hid_device* handle, TritonInterface connectio
   this->connectionType = connection;
 }
 
+TritonController::~TritonController()
+{
+  this->stopPoll();
+  this->close();
+}
+
 void TritonController::close() {
   hid_close(hid_handle);
 }
