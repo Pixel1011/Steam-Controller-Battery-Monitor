@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/msys64/ucrt64/include/hidapi/**",
+                "C:/msys64/ucrt64/include/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
+            "cStandard": "c23",
+            "cppStandard": "c++26",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
