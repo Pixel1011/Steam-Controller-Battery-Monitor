@@ -15,8 +15,6 @@ Lightweight program that creates a tray icon that will allow you to monitor the 
 
 
 **Supported device:** Steam Controller (2026). Other controllers are unsupported.
-
----
 [**Download the latest build here!**]()
 
 #### Windows
