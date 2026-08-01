@@ -58,4 +58,4 @@ I would appreciate stars, they make me happy :3
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N6145I0V)
 
-If you find this cool, feel free to check out [SteamHapticsPlayer]()
+If you find this cool, feel free to check out [SteamHapticsPlayer](https://github.com/Pixel1011/SteamHapticsPlayer) to play audio files on your controller!
