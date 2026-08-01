@@ -10,6 +10,7 @@ Lightweight program that creates a tray icon that will allow you to monitor the 
 - Option to start with pc
 - Icons (either procedural or something silly)
 - battery monitoring functionality to measure capacity and battery loss over time
+- General polish and UI
 
 ## How To
 
