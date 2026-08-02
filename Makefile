@@ -33,12 +33,12 @@ CXXFLAGS += $(shell pkg-config --cflags $(QT_PKG))
 LDLIBS += $(shell pkg-config --libs $(HIDAPI_PKG))
 LDLIBS += $(shell pkg-config --libs $(QT_PKG))
 
-TRITON_SRC := $(wildcard tritonLib/*.cpp tritonLib/*/*.cpp tritonLib/*.c tritonLib/*/*.c)
+TRITON_SRC := $(wildcard TritonLib/src/*.cpp TritonLib/src/*/*.cpp TritonLib/src/*.c TritonLib/src/*/*.c)
 BATTERYMON_SRC := $(wildcard src/*.cpp src/*/*.cpp src/*.c src/*/*.c)
 
 
 scbattery-monitor: $(BATTERYMON_SRC) $(TRITON_SRC)
-	g++ -ItritonLib -o scbattery-monitor $^ $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
+	g++ -ITritonLib/include -o scbattery-monitor $^ $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
 
 clean:
 	rm -f scbattery-monitor scbattery-monitor.exe qrc_resources.cpp
