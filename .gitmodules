@@ -1,0 +1,3 @@
+[submodule "TritonLib"]
+	path = TritonLib
+	url = https://github.com/Pixel1011/TritonLib.git
