@@ -31,7 +31,13 @@ Lightweight program that creates a tray icon that will allow you to monitor the 
 
 
 ## Compiling
+
+**Clone with submodules:**
+``git clone --recurse-submodules https://github.com/Pixel1011/Steam-Controller-Battery-Monitor.git``
+
+
 **Build (Linux / WSL)**
+
 
 ```bash
 sudo apt update
