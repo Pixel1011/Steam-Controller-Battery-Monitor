@@ -1,8 +1,5 @@
 # Steam Controller Battery Monitor
-
-Lightweight program that creates a tray icon that will allow you to monitor the steam controller's (2026) battery.
-
-(very very WIP, but it does technically do what it says now, albeit i wont upload an executable until its at a level i'm happy with)
+ do what it says now, albeit i wont upload an executable until its at a level i'm happy with)
 
 ## TODO:
 - Keep program running if steam controller is disconnected.
