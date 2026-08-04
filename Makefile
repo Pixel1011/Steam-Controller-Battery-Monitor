@@ -1,14 +1,20 @@
-.PHONY: all release clean
+.PHONY: all release clean sanitize
 all: scbattery-monitor
 release: all
+sanitize: all
 
 
 CXXFLAGS = -std=c++20 -Wall -Werror
 
 DEBUG_FLAGS := -g -Og
 RELEASE_FLAGS := -O2
+SANITIZER_FLAGS = -fsanitize=address,undefined -fno-omit-frame-pointer
 
-ifeq ($(filter release,$(MAKECMDGOALS)), release)
+ifeq ($(filter sanitize,$(MAKECMDGOALS)), sanitize)
+  CXXFLAGS += $(DEBUG_FLAGS)
+  CXXFLAGS += $(SANITIZER_FLAGS)
+  CXXFLAGS += -DSANITIZER_BUILD
+else ifeq ($(filter release,$(MAKECMDGOALS)), release)
   CXXFLAGS += $(RELEASE_FLAGS)
   IS_RELEASE = 1
 else
@@ -19,7 +25,7 @@ ifeq ($(OS),Windows_NT)
   HIDAPI_PKG ?= hidapi
 
   ifeq ($(IS_RELEASE),1)
-    LDFLAGS += -mwindows
+    # LDFLAGS += -mwindows
   endif
 else
   HIDAPI_PKG ?= hidapi-hidraw

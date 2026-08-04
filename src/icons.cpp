@@ -2,9 +2,10 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPen>
+#include <QPixmapCache>
+
 IconGenerator::IconGenerator() {
-  font = QFont("Segoe UI Symbol");
-  font.setStyleHint(QFont::SansSerif);
+  QPixmapCache::setCacheLimit(24);
 }
 
 IconGenerator::~IconGenerator() {}
@@ -13,49 +14,73 @@ IconGenerator::~IconGenerator() {}
 // this is awful, i hate image gen code, its just numbers with barely any visualisation
 
 QIcon IconGenerator::createBatteryIcon(const TritonBatteryStatus_t* battery) {
-  bool disconnected = false; //, charging = false;
-  double level = 0.0;
-  // just in case a controller is just connected and data hasnt been filled yet
-  if (battery == nullptr || (battery->sSystemVoltage == 0 && battery->ucBatteryLevel == 0)) {
-    disconnected = true;
-  } else {
-    level = static_cast<double>(battery->ucBatteryLevel) / 100.0;
+
+  bool disconnected = battery == nullptr || (battery->sSystemVoltage == 0 && battery->ucBatteryLevel == 0);
+
+  if (disconnected) {
+    QIcon& cachedIcon = iconCache[28];
+    if (cachedIcon.isNull()) {
+      cachedIcon = renderIcon(0, false, disconnected, 0);
+    }
+    return cachedIcon;
   }
 
-  QIcon icon;
+  int perc = std::clamp(static_cast<int>(battery->ucBatteryLevel), 0, 100);
 
-  QPixmap pixmap(256, 256);
+  int filledPixels = (static_cast<int>(perc) * 13) / 100;
+  bool charging = battery->ucChargeState == EChargeState::k_EChargeStateCharging;
+
+  int cacheIdx = filledPixels;
+  if (charging) cacheIdx += 14;
+
+  QIcon& cachedIcon = iconCache[cacheIdx];
+  if (cachedIcon.isNull()) {
+    cachedIcon = renderIcon(filledPixels, charging, disconnected, perc);
+  }
+  return cachedIcon;
+}
+
+QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnected, uint8_t batteryLevel) {
+
+  const double maxFilledPixels = 13.0;
+
+  QIcon icon;
+  double scale = 0.0625;
+  QPixmap pixmap(16, 16);
   pixmap.fill(Qt::transparent);
 
   QPainter painter(&pixmap);
   painter.setRenderHint(QPainter::Antialiasing);
 
-  const QRectF body(7.0, 48.0, 221.0, 160.0);
+  // 256x256 scale
 
-  const QRectF terminal(228.0, 96.0, 22.0, 64.0);
+  const QRectF body(7.0 * scale, 48.0 * scale, 221.0 * scale, 160.0 * scale);
+  const QRectF terminal(228.0 * scale, 96.0 * scale, 22.0 * scale, 64.0 * scale);
 
-  const double outlineWidth = 12.0;
-  const double cornerRadius = 0; // 20.0;
+  const double outlineWidth = 12.0 * scale;
+  const double cornerRadius = 20.0 * scale;
 
   painter.setPen(Qt::NoPen);
   painter.setBrush(Qt::black);
   // draw nub thing on end
-  painter.drawRoundedRect(terminal, 7.0, 7.0);
+  painter.drawRoundedRect(terminal, 7.0 * scale, 7.0 * scale);
 
-  const QRectF interior = body.adjusted(6.0, 6.0, -6.0, -6.0);
+  const QRectF interior = body.adjusted(6.0 * scale, 6.0 * scale, -6.0 * scale, -6.0 * scale);
   QPainterPath interiorPath;
-
-  interiorPath.addRoundedRect(interior, 10.0, 10.0);
-
-  painter.save();
-  painter.setClipPath(interiorPath);
-
-  QColor levelColour = QColor(0, 255, 35);
-  if (level <= 0.1) levelColour = QColor(125, 0, 0);
+  interiorPath.addRoundedRect(interior, 10.0 * scale, 10.0 * scale);
 
   // draw inside
-  painter.fillRect(QRectF(interior.left(), interior.top(), interior.width() * level, interior.height()), levelColour);
-  painter.restore();
+  if (!disconnected && filledPixels > 0) {
+    painter.save();
+    painter.setClipPath(interiorPath);
+
+    QColor levelColour = QColor(0, 255, 35);
+    if (batteryLevel <= 0.1) levelColour = QColor(125, 0, 0);
+    double level = static_cast<double>(filledPixels) / maxFilledPixels;
+
+    painter.fillRect(QRectF(interior.left(), interior.top(), interior.width() * level, interior.height()), levelColour);
+    painter.restore();
+  }
 
   // draw outside
   painter.setBrush(Qt::NoBrush);
@@ -65,34 +90,29 @@ QIcon IconGenerator::createBatteryIcon(const TritonBatteryStatus_t* battery) {
 
   if (disconnected) {
     painter.setPen(QPen(Qt::red, outlineWidth, Qt::SolidLine, Qt::RoundCap));
-    painter.drawLine(20, 240, 240, 20);
+    painter.drawLine(20 * scale, 240 * scale, 240 * scale, 20 * scale);
   }
 
-  if (battery->ucChargeState == EChargeState::k_EChargeStateCharging) {
+  if (!disconnected && charging) {
+    QPainterPath bolt;
+
+    bolt.moveTo(60.0 * scale, 15.0 * scale);
+    bolt.lineTo(18.0 * scale, 135.0 * scale);
+    bolt.lineTo(45.0 * scale, 135.0 * scale);
+    bolt.lineTo(32.0 * scale, 240.0 * scale);
+    bolt.lineTo(88.0 * scale, 105.0 * scale);
+    bolt.lineTo(58.0 * scale, 105.0 * scale);
+    bolt.closeSubpath();
+
     painter.save();
-    QFont f = font;
-    f.setPointSize(120);
     painter.setOpacity(0.7);
-    painter.setFont(f);
-
-    QRectF chargeRect(0.0, -10.0, 100.0, 255.0);
-    QFontMetricsF fm(f);
-    QRectF br = fm.boundingRect(QStringLiteral("⚡"));
-
-    QPointF origin(chargeRect.center().x() - br.width() / 2.0, chargeRect.center().y() + br.height() / 2.0 - fm.descent());
-
-    QPainterPath path;
-    path.addText(origin, f, QStringLiteral("⚡"));
-
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
-    painter.drawPath(path);
+    painter.drawPath(bolt);
     painter.restore();
   }
 
   painter.end();
-  pixmap.save("output.png", "PNG");
-
-  icon.addPixmap(pixmap);
-  return icon;
+  // pixmap.save("output.png", "PNG");
+  return QIcon(pixmap);
 }

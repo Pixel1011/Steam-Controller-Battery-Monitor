@@ -1,17 +1,20 @@
 #pragma once
-#include <Qicon>
+#include <QIcon>
 #include <TritonController.h>
-#include <Qfont>
+#include <array>
+#include <algorithm>
 
 class IconGenerator
 {
 private:
-  QFont font;
+  std::array<QIcon, 29> iconCache{};
+
 public:
-  IconGenerator(/* args */);
+  IconGenerator();
   ~IconGenerator();
 
   
   // im making it all in one function i do not care
   QIcon createBatteryIcon(const TritonBatteryStatus_t* battery);
+  QIcon renderIcon(int filledPixels, bool charging, bool disconnected, uint8_t batteryLevel);
 };
