@@ -1,13 +1,7 @@
 # Steam Controller Battery Monitor
  do what it says now, albeit i wont upload an executable until its at a level i'm happy with)
 
-## TODO:
-- Keep program running if steam controller is disconnected.
-  - rework some parts of triton lib to not kill program if hid error occurs
-- Option to start with pc
-- Icons (either procedural or something silly)
-- battery monitoring functionality to measure capacity and battery loss over time
-- General polish and UI
+
 
 ## How To
 
@@ -57,6 +51,11 @@ pacman -S mingw-w64-ucrt-x86_64-gcc \
 make
 ```
 ## Changelog
+
+## TODO in future:
+- Option to start with pc
+- battery monitoring functionality to measure capacity and battery loss over time
+- with above, also add time till charged metric
 
 I would appreciate stars, they make me happy :3
 
