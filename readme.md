@@ -7,7 +7,7 @@
 
 
 **Supported device:** Steam Controller (2026). Other controllers are unsupported.
-[**Download the latest build here!**]()
+[**Download the latest build here!**](https://github.com/Pixel1011/Steam-Controller-Battery-Monitor/releases/latest)
 
 #### Windows
 1. Extract the files and run executable
