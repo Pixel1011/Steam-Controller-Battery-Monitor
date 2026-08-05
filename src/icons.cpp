@@ -5,6 +5,7 @@
 #include <QPixmapCache>
 
 IconGenerator::IconGenerator() {
+  // does nothing i think but :catsilly:
   QPixmapCache::setCacheLimit(24);
 }
 

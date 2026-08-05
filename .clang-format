@@ -8,4 +8,4 @@ AllowShortEnumsOnASingleLine: false
 PointerAlignment: Left
 UseTab: Never
 IndentCaseLabels: true
-IndentCaseBlocks: true
+IndentCaseBlocks: false

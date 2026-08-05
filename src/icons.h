@@ -7,14 +7,13 @@
 class IconGenerator
 {
 private:
+  // cache required otherwise setIcon will increase in memory over time (assuming it has it's own cache or something)
   std::array<QIcon, 29> iconCache{};
 
 public:
   IconGenerator();
   ~IconGenerator();
 
-  
-  // im making it all in one function i do not care
   QIcon createBatteryIcon(const TritonBatteryStatus_t* battery);
   QIcon renderIcon(int filledPixels, bool charging, bool disconnected, uint8_t batteryLevel);
 };

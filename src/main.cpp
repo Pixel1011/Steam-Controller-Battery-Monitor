@@ -1,6 +1,7 @@
 #include "icons.h"
 #include <ControllerFinder.h>
 #include <QAction>
+#include <QApplication>
 #include <QCoreApplication>
 #include <QIcon>
 #include <QMenu>
@@ -8,12 +9,37 @@
 #include <QStyle>
 #include <QSystemTrayIcon>
 #include <QTimer>
-#include <QApplication>
 #include <TritonController.h>
 
 TritonController* c = nullptr;
 ControllerFinder finder;
 IconGenerator igen;
+
+QString getStatusMessage(const TritonBatteryStatus_t* battery) {
+  if (battery == nullptr) return "Status: Disconnected.";
+  switch (static_cast<EChargeState>(battery->ucChargeState)) {
+    case EChargeState::k_EChargeStateCharging: {
+      return QString("Status: Charging.");
+    }
+    case EChargeState::k_EChargeStateChargingDone: {
+      return QString("Status: Finished charging.");
+    }
+    case EChargeState::k_EChargeStateDischarging: {
+      return QString("Status: Discharging.");
+    }
+    case EChargeState::k_EChargeStateReset: {
+      // no idea
+      return QString("Status: Charge state reset.");
+    }
+    case EChargeState::k_EChargeStateSrcValidate: {
+      // absolutely no idea what this one is, guessing
+      return QString("Status: Validating power source.");
+    }
+    default: {
+      return QString("Status: Unknown state.");
+    }
+  }
+}
 
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
@@ -26,17 +52,21 @@ int main(int argc, char* argv[]) {
 #endif
 
   QMenu menu;
-  QAction* statusAction = menu.addAction("Monitoring battery");
+  QAction* percentageAction = menu.addAction("Monitoring battery");
+  QAction* statusAction = menu.addAction("Status: Starting monitor...");
+  percentageAction->setEnabled(false);
   statusAction->setEnabled(false);
+
   menu.addSeparator();
+
   QAction* quitAction = menu.addAction("Quit");
+
   QSystemTrayIcon trayIcon;
   trayIcon.setToolTip("SC26 Battery monitor");
   trayIcon.setContextMenu(&menu);
 
   QIcon nextIcon = igen.createBatteryIcon(nullptr);
-
-  trayIcon.setIcon(igen.createBatteryIcon(nullptr));
+  trayIcon.setIcon(nextIcon);
 
   QObject::connect(quitAction, &QAction::triggered, &app, &QCoreApplication::quit);
   trayIcon.show();
@@ -44,7 +74,6 @@ int main(int argc, char* argv[]) {
   c = finder.getController();
   if (c != nullptr) c->startPoll();
   double counter = 0.0;
-
 
   auto updatefunc = [&]() {
     counter++;
@@ -56,8 +85,12 @@ int main(int argc, char* argv[]) {
       if (cont == nullptr) {
         nextIcon = igen.createBatteryIcon(nullptr);
         if (trayIcon.icon().cacheKey() != nextIcon.cacheKey()) trayIcon.setIcon(nextIcon);
-        statusAction->setText(QString("Steam Controller disconnected."));
-        trayIcon.setToolTip(QString("Steam Controller disconnected."));
+
+        QString disabledStr = "Steam Controller disconnected.";
+        QString disabledStr2 = "Status: Disconnected.";
+        if (percentageAction->text() != disabledStr) percentageAction->setText(disabledStr);
+        if (trayIcon.toolTip() != disabledStr) trayIcon.setToolTip(disabledStr);
+        if (statusAction->text() != disabledStr2) statusAction->setText(disabledStr2);
         return;
       }
       c = cont;
@@ -65,10 +98,11 @@ int main(int argc, char* argv[]) {
       return;
     }
     TritonBatteryStatus_t batt = c->getBatteryStatus();
-    QString str = QString("Steam Controller battery: %1%").arg(batt.ucBatteryLevel);
-
-    if (statusAction->toolTip() != str) statusAction->setText(QString("Steam Controller battery: %1%").arg(batt.ucBatteryLevel));
-    if (trayIcon.toolTip() != str) trayIcon.setToolTip(QString("Steam Controller battery: %1%").arg(batt.ucBatteryLevel));
+    QString percStr = QString("Steam Controller battery: %1%").arg(batt.ucBatteryLevel);
+    QString statusStr = getStatusMessage(&batt);
+    if (percentageAction->text() != percStr) percentageAction->setText(QString(percStr).arg(batt.ucBatteryLevel));
+    if (trayIcon.toolTip() != percStr) trayIcon.setToolTip(QString(percStr).arg(batt.ucBatteryLevel));
+    if (statusAction->text() != statusStr) statusAction->setText(statusStr);
 
     nextIcon = igen.createBatteryIcon(&batt);
     if (trayIcon.icon().cacheKey() != nextIcon.cacheKey()) trayIcon.setIcon(nextIcon);
@@ -76,7 +110,7 @@ int main(int argc, char* argv[]) {
 
   QTimer update;
   QObject::connect(&update, &QTimer::timeout, &app, updatefunc);
-  update.start(3500);
+  update.start(1);
 
 #ifdef SANITIZER_BUILD
   QTimer::singleShot(120000, &app, &QCoreApplication::quit);
