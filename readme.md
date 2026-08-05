@@ -1,5 +1,5 @@
 # Steam Controller Battery Monitor
- do what it says now, albeit i wont upload an executable until its at a level i'm happy with)
+ does what it says now, albeit i wont upload an executable until its at a level i'm happy with
 
 
 
