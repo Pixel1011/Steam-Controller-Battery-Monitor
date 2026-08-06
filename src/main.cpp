@@ -1,4 +1,5 @@
 #include "icons.h"
+#include "startup.h"
 #include <ControllerFinder.h>
 #include <QAction>
 #include <QApplication>
@@ -56,9 +57,11 @@ int main(int argc, char* argv[]) {
   QAction* statusAction = menu.addAction("Status: Starting monitor...");
   percentageAction->setEnabled(false);
   statusAction->setEnabled(false);
-
+  
   menu.addSeparator();
-
+  QAction* startupAction = menu.addAction("Start at login");
+  startupAction->setCheckable(true);
+  startupAction->setChecked(Startup::startsAtLogin());
   QAction* quitAction = menu.addAction("Quit");
 
   QSystemTrayIcon trayIcon;
@@ -69,7 +72,19 @@ int main(int argc, char* argv[]) {
   trayIcon.setIcon(nextIcon);
 
   QObject::connect(quitAction, &QAction::triggered, &app, &QCoreApplication::quit);
+  
+  QObject::connect(startupAction, &QAction::toggled, &app, [&](bool enabled) {
+    bool success = Startup::setStartsAtLogin(enabled);
+    if (success) return;
+    // fail
+    QSignalBlocker block(startupAction);
+    startupAction->setChecked(!enabled);
+    trayIcon.showMessage("Steam controller battery monitor", "Could not change startup setting.", QSystemTrayIcon::Warning);
+  });
+  
   trayIcon.show();
+
+
 
   c = finder.getController();
   if (c != nullptr) c->startPoll();
@@ -100,8 +115,8 @@ int main(int argc, char* argv[]) {
     TritonBatteryStatus_t batt = c->getBatteryStatus();
     QString percStr = QString("Steam Controller battery: %1%").arg(batt.ucBatteryLevel);
     QString statusStr = getStatusMessage(&batt);
-    if (percentageAction->text() != percStr) percentageAction->setText(QString(percStr).arg(batt.ucBatteryLevel));
-    if (trayIcon.toolTip() != percStr) trayIcon.setToolTip(QString(percStr).arg(batt.ucBatteryLevel));
+    if (percentageAction->text() != percStr) percentageAction->setText(percStr);
+    if (trayIcon.toolTip() != percStr) trayIcon.setToolTip(percStr);
     if (statusAction->text() != statusStr) statusAction->setText(statusStr);
 
     nextIcon = igen.createBatteryIcon(&batt);
@@ -110,7 +125,7 @@ int main(int argc, char* argv[]) {
 
   QTimer update;
   QObject::connect(&update, &QTimer::timeout, &app, updatefunc);
-  update.start(1);
+  update.start(3500);
 
 #ifdef SANITIZER_BUILD
   QTimer::singleShot(120000, &app, &QCoreApplication::quit);
