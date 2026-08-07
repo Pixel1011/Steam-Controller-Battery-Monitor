@@ -56,11 +56,14 @@ make
 ```
 ## Changelog
 
+[v1.0.0]
+Initial Release
+
 ## TODO in future:
 - battery monitoring functionality to measure capacity and battery loss over time
 - with above, also add time till charged metric
 
-I would appreciate stars, they make me happy :3
+I would appreciate stars, they make me happy :3c
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N6145I0V)
 
