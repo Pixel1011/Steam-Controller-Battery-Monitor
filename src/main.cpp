@@ -1,6 +1,6 @@
 #include "icons.h"
 #include "startup.h"
-#include <ControllerFinder.h>
+#include <TritonFinder.h>
 #include <QAction>
 #include <QApplication>
 #include <QCoreApplication>
@@ -13,7 +13,7 @@
 #include <TritonController.h>
 
 TritonController* c = nullptr;
-ControllerFinder finder;
+TritonFinder finder;
 IconGenerator igen;
 
 QString getStatusMessage(const TritonBatteryStatus_t* battery) {
