@@ -46,8 +46,8 @@ QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnect
   const double maxFilledPixels = 13.0;
 
   QIcon icon;
-  double scale = 0.0625;
-  QPixmap pixmap(16, 16);
+  double scale = 64.0 / 256.0;
+  QPixmap pixmap(64, 64);
   pixmap.fill(Qt::transparent);
 
   QPainter painter(&pixmap);
