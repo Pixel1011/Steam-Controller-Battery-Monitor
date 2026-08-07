@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
   QAction* quitAction = menu.addAction("Quit");
 
   QSystemTrayIcon trayIcon;
-  trayIcon.setToolTip("SC26 Battery monitor");
+  trayIcon.setToolTip("Loading...");
   trayIcon.setContextMenu(&menu);
 
   QIcon nextIcon = igen.createBatteryIcon(nullptr);
@@ -87,12 +87,14 @@ int main(int argc, char* argv[]) {
 
 
   c = finder.getController();
+
+  // maybe future optimisation when i can be bothered, only read when actually needing the data, feels annoying though due to blocking and battery info only being every 3.5secs and not on request
   if (c != nullptr) c->startPoll();
-  double counter = 0.0;
+  //double counter = 0.0;
 
   auto updatefunc = [&]() {
-    counter++;
-    std::cout << (counter * 3.5) / 60.0 << std::endl;
+    //counter++;
+    //std::cout << (counter * 3.5) / 60.0 << std::endl;
     if (c == nullptr || c->disconnected.load()) {
       delete c;
       c = nullptr;
