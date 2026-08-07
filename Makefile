@@ -25,13 +25,13 @@ ifeq ($(OS),Windows_NT)
   HIDAPI_PKG ?= hidapi
 
   ifeq ($(IS_RELEASE),1)
-    # LDFLAGS += -mwindows
+    LDFLAGS += -mwindows
   endif
 else
   HIDAPI_PKG ?= hidapi-hidraw
 endif
 
-QT_PKG := Qt6Widgets
+QT_PKG := Qt6Widgets Qt6DBus
 
 CXXFLAGS += $(shell pkg-config --cflags $(HIDAPI_PKG))
 CXXFLAGS += $(shell pkg-config --cflags $(QT_PKG))

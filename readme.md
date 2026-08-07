@@ -40,8 +40,6 @@ sudo apt install build-essential pkg-config libhidapi-dev qt6-base-dev qt6-base-
 make
 ```
 
-^ make sure Qt is version >=6.5 
-
 **Build (Windows, MSYS2 UCRT64)**
 ```bash
 pacman -Syu
