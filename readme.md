@@ -1,7 +1,6 @@
 # Steam Controller Battery Monitor
- does what it says now, albeit i wont upload an executable until its at a level i'm happy with
-
-
+  A lightweight, cross-platform tray icon to get information about the steam controller's battery
+  I don't know why there isnt a good place to get this information normally
 
 ## How To
 
@@ -15,7 +14,12 @@
 3. Yippee!
 
 #### On Linux
-1. Install libhid (with i believe either, `sudo apt install libhidapi-dev` or `sudo pacman -S hidapi`)
+1. Install libhid and Qt6 libs if not already installed with either (exclude wayland package if not using wayland),
+      `sudo apt install libhidapi-dev libqt6core6 libqt6core6 libqt6gui6 qt6-wayland` 
+      or 
+      `sudo pacman -S hidapi qt6-base qt6-wayland`
+
+
 2. Extract files and run executable
 3. Observe battery percentage in tray
 4. Yippee!
@@ -36,6 +40,8 @@ sudo apt install build-essential pkg-config libhidapi-dev qt6-base-dev qt6-base-
 make
 ```
 
+^ make sure Qt is version >=6.5 
+
 **Build (Windows, MSYS2 UCRT64)**
 ```bash
 pacman -Syu
@@ -53,7 +59,6 @@ make
 ## Changelog
 
 ## TODO in future:
-- Option to start with pc
 - battery monitoring functionality to measure capacity and battery loss over time
 - with above, also add time till charged metric
 
