@@ -1,6 +1,5 @@
 #include "icons.h"
 #include <QApplication>
-#include <QGuiApplication>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPalette>
@@ -10,18 +9,32 @@
 #include <QStyleHints>
 #include <QtGlobal>
 
+#ifdef __linux__
+#include <QDBusInterface>
+#include <QDBusReply>
+#include <QDBusVariant>
+#endif
+
 IconGenerator::IconGenerator() {
   // does nothing i think but :catsilly:
   QPixmapCache::setCacheLimit(24);
 #ifdef __linux__
-  Qt::ColorScheme scheme = QGuiApplication::styleHints()->colorScheme();
-  if (scheme == Qt::ColorScheme::Dark) {
+
+  QDBusInterface settings("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop", "org.freedesktop.portal.Settings", QDBusConnection::sessionBus());
+  if (!settings.isValid()) {
     isDarkmode = true;
-  } else if (scheme == Qt::ColorScheme::Light) {
-    isDarkmode = false;
   } else {
-    QPalette palette = QApplication::palette();
-    isDarkmode = palette.color(QPalette::Window).lightness() < palette.color(QPalette::WindowText).lightness();
+    QDBusReply<QDBusVariant> reply = settings.call("ReadOne", "org.freedesktop.appearance", "color-scheme");
+    
+    const uint scheme = reply.value().variant().toUInt();
+    if (scheme == 1) {
+      isDarkmode = true;
+    }
+    if (scheme == 0) {
+      isDarkmode = false;
+    } else {
+      isDarkmode = true;
+    }
   }
 #elif defined(_WIN32)
   QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
@@ -74,8 +87,11 @@ QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnect
   painter.setRenderHint(QPainter::Antialiasing);
 
   QColor mainColour = Qt::black;
-  if (isDarkmode) mainColour = Qt::white;
-
+  QColor oppColour = Qt::white;
+  if (isDarkmode) {
+    mainColour = Qt::white;
+    oppColour = Qt::black;
+  }
   // 256x256 scale
 
   const QRectF body(7.0 * scale, 48.0 * scale, 221.0 * scale, 160.0 * scale);
@@ -131,7 +147,7 @@ QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnect
     painter.save();
     painter.setOpacity(0.7);
     painter.setPen(Qt::NoPen);
-    painter.setBrush(mainColour);
+    painter.setBrush(oppColour);
     painter.drawPath(bolt);
     painter.restore();
   }
