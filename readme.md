@@ -1,5 +1,6 @@
 # Steam Controller Battery Monitor
   A lightweight, cross-platform tray icon to get information about the steam controller's battery
+  
   I don't know why there isnt a good place to get this information normally
 
 ## How To
