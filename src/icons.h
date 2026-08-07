@@ -9,7 +9,7 @@ class IconGenerator
 private:
   // cache required otherwise setIcon will increase in memory over time (assuming it has it's own cache or something)
   std::array<QIcon, 29> iconCache{};
-
+  bool isDarkmode;
 public:
   IconGenerator();
   ~IconGenerator();

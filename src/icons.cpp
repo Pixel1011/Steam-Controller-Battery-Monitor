@@ -1,12 +1,32 @@
 #include "icons.h"
+#include <QApplication>
+#include <QGuiApplication>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPalette>
 #include <QPen>
 #include <QPixmapCache>
+#include <QSettings>
+#include <QStyleHints>
+#include <QtGlobal>
 
 IconGenerator::IconGenerator() {
   // does nothing i think but :catsilly:
   QPixmapCache::setCacheLimit(24);
+#ifdef __linux__
+  Qt::ColorScheme scheme = QGuiApplication::styleHints()->colorScheme();
+  if (scheme == Qt::ColorScheme::Dark) {
+    isDarkmode = true;
+  } else if (scheme == Qt::ColorScheme::Light) {
+    isDarkmode = false;
+  } else {
+    QPalette palette = QApplication::palette();
+    isDarkmode = palette.color(QPalette::Window).lightness() < palette.color(QPalette::WindowText).lightness();
+  }
+#elif defined(_WIN32)
+  QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
+  isDarkmode = settings.value("SystemUsesLightTheme", 1).toInt() == 0;
+#endif
 }
 
 IconGenerator::~IconGenerator() {}
@@ -53,6 +73,9 @@ QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnect
   QPainter painter(&pixmap);
   painter.setRenderHint(QPainter::Antialiasing);
 
+  QColor mainColour = Qt::black;
+  if (isDarkmode) mainColour = Qt::white;
+
   // 256x256 scale
 
   const QRectF body(7.0 * scale, 48.0 * scale, 221.0 * scale, 160.0 * scale);
@@ -62,7 +85,7 @@ QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnect
   const double cornerRadius = 20.0 * scale;
 
   painter.setPen(Qt::NoPen);
-  painter.setBrush(Qt::black);
+  painter.setBrush(mainColour);
   // draw nub thing on end
   painter.drawRoundedRect(terminal, 7.0 * scale, 7.0 * scale);
 
@@ -85,7 +108,7 @@ QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnect
 
   // draw outside
   painter.setBrush(Qt::NoBrush);
-  painter.setPen(QPen(Qt::black, outlineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+  painter.setPen(QPen(mainColour, outlineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
   painter.drawRoundedRect(body, cornerRadius, cornerRadius);
 
@@ -108,7 +131,7 @@ QIcon IconGenerator::renderIcon(int filledPixels, bool charging, bool disconnect
     painter.save();
     painter.setOpacity(0.7);
     painter.setPen(Qt::NoPen);
-    painter.setBrush(Qt::black);
+    painter.setBrush(mainColour);
     painter.drawPath(bolt);
     painter.restore();
   }
