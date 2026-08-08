@@ -5,6 +5,10 @@
 
 ![](https://img.pixelator.xyz/V5hxYuYw.png)
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N6145I0V)
+No need to donate, though is greatly appreciated!
+
+
 ## How To
 
 
@@ -66,7 +70,5 @@ Initial Release
 - with above, also add time till charged metric
 
 I would appreciate stars, they make me happy :3c
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N6145I0V)
 
 If you find this cool, feel free to check out [SteamHapticsPlayer](https://github.com/Pixel1011/SteamHapticsPlayer) to play audio files on your controller!
