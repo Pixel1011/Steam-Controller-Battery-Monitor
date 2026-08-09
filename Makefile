@@ -29,6 +29,7 @@ ifeq ($(OS),Windows_NT)
   endif
 else
   HIDAPI_PKG ?= hidapi-hidraw
+  CXXFLAGS += -fPIC -pie
 endif
 
 QT_PKG := Qt6Widgets Qt6DBus
